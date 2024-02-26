@@ -1,245 +1,188 @@
 import javax.swing.*;
-import javax.swing.border.Border;
+
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.Random;
 
+//
 public class RockPaperScissorsFrame extends JFrame
 {
+    // instance variables
+    JPanel mainPnl;
+
+    JPanel decidePnl;
+    JPanel statsPnl;
+    JPanel winnerPnl;
 
 
-    JPanel controlPnl;
-    JPanel DisplayPnl;
-    JPanel main;
-
-
-
-
-
-
+    // buttons
     JButton rockBtn;
     JButton paperBtn;
     JButton scissorsBtn;
     JButton quitBtn;
+    ImageIcon rockImg;
+    ImageIcon paperImg;
+    ImageIcon scissorsImg;
 
-    JButton spaceBtn;
-    JButton spaceBtn2;
-
-    int computerWins;
+    // labels
+    JLabel playerWinsL;
+    JLabel computerWinsL;
+    JLabel tiesLabel;
+    JTextField statsTF;
+    // counters
     int playerWins;
+    int computerWins;
     int ties;
 
-
-    ImageIcon rockIcon;
-    ImageIcon paperIcon;
-    ImageIcon scissorIcon;
-
-
-
-    String playerWinsString;
-    String computerWinsString;
-    String tiesString;
+    // text area
+    JTextArea displayTA;
+    JScrollPane scroller;
 
     Random rnd = new Random();
 
-    public RockPaperScissorsFrame()
-    {
-        setTitle("Rock, Paper, Scissors");
-        main = new JPanel();
-        main.setLayout(new BorderLayout());
-        setVisible(true);
+    public RockPaperScissorsFrame() {
+        // set the layout
+        mainPnl = new JPanel();
+        mainPnl.setLayout(new GridLayout(4, 1));
+
+
+        // create the title panel
+        createDecidePnl();
+        mainPnl.add(decidePnl);
+
+        // create the stats panel
+        StatsPnl();
+        mainPnl.add(statsPnl);
+
+        WinnerPnl();
+        mainPnl.add(winnerPnl);
+
+        // add the main panel to the frame
+        add(mainPnl);
+        setSize(700, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(main);
-        setSize(600, 500);
-
-        createDisplayPnl();
-        main.add(DisplayPnl, BorderLayout.CENTER);
-
-
-        ControlPanel();
-        main.add(controlPnl, BorderLayout.SOUTH);
-
-
-
+        setVisible(true);
     }
 
-    private void createDisplayPnl()
-    {
-        DisplayPnl = new JPanel();
-        DisplayPnl.setLayout(new GridLayout(3, 1));
-        Border etched = new TitledBorder(new EtchedBorder(), "Score");
-        DisplayPnl.setBorder(etched);
-        DisplayPnl.setBackground(Color.LIGHT_GRAY);
-        DisplayPnl.setVisible(true);
-
-        playerWinsString = String.valueOf(playerWins);
 
 
+    private void createDecidePnl() {
+        // create to decide panel
+        decidePnl = new JPanel();
+        decidePnl.setLayout(new GridLayout(1, 4));
+        decidePnl.setBorder(new TitledBorder(new EtchedBorder(), "Pick"));
 
-    }
+        rockImg = new ImageIcon("src/rock.jpg");
+        paperImg = new ImageIcon("src/paper.jpg");
+        scissorsImg = new ImageIcon("src/scissors.jpg");
 
-    private void ControlPanel()
-    {
-        controlPnl = new JPanel();
-        controlPnl.setLayout(new GridLayout(2, 3));
-        controlPnl.setBackground(Color.LIGHT_GRAY);
-        controlPnl.setVisible(true);
-
-        rockIcon = new ImageIcon("src/Rock.jpg");
-        paperIcon = new ImageIcon("src/Paper.jpg");
-        scissorIcon = new ImageIcon("src/Scissors.jpg");
-
-        Image rockImage = rockIcon.getImage();
-        Image rockNewIMG = rockImage.getScaledInstance(75,75, Image.SCALE_SMOOTH);
-        rockIcon = new ImageIcon((rockNewIMG));
-
-        Image paperImage = paperIcon.getImage();
-        Image paperNewIMG = paperImage.getScaledInstance(75,75, Image.SCALE_SMOOTH);
-        paperIcon = new ImageIcon((paperNewIMG));
-
-        Image scissorImage = scissorIcon.getImage();
-        Image scissorNewIMG = scissorImage.getScaledInstance(75,75, Image.SCALE_SMOOTH);
-        scissorIcon = new ImageIcon((scissorNewIMG));
-
-
-
-        rockBtn = new JButton("Rock", rockIcon);
-        rockBtn.addActionListener(e -> rock());
-        rockBtn.setFont(new Font("Dialog", Font.BOLD, 14));
-
-        paperBtn = new JButton("Paper", paperIcon);
-        paperBtn.addActionListener(e -> paper());
-        paperBtn.setFont(new Font("Dialog", Font.BOLD, 14));
-
-        scissorsBtn = new JButton("Scissors", scissorIcon);
-        scissorsBtn.addActionListener(e -> scissors());
-        scissorsBtn.setFont(new Font("Dialog", Font.BOLD, 14));
-
+        rockBtn = new JButton(rockImg);
+        paperBtn = new JButton(paperImg);
+        scissorsBtn = new JButton(scissorsImg);
         quitBtn = new JButton("Quit");
-        quitBtn.addActionListener(e -> quit());
 
-        spaceBtn = new JButton("");
-        spaceBtn.setBackground(Color.LIGHT_GRAY);
-        spaceBtn.setEnabled(false);
+        decidePnl.add(rockBtn);
+        decidePnl.add(paperBtn);
+        decidePnl.add(scissorsBtn);
+        decidePnl.add(quitBtn);
 
-        spaceBtn2 = new JButton("");
-        spaceBtn2.setBackground(Color.LIGHT_GRAY);
-        spaceBtn2.setEnabled(false);
+        rockBtn.addActionListener((ActionEvent ae) -> {
+            displayTA.append("You play: Rock\n");
+            play(0);
+        });
 
+        paperBtn.addActionListener((ActionEvent ae) -> {
+            displayTA.append("You play: Paper\n");
+            play(1);
+        });
 
-        controlPnl.add(rockBtn);
-        controlPnl.add(paperBtn);
-        controlPnl.add(scissorsBtn);
+        scissorsBtn.addActionListener((ActionEvent ae) -> {
+            displayTA.append("You play: Scissors\n");
+            play(2);
+        });
 
-        controlPnl.add(spaceBtn);
-        controlPnl.add(quitBtn);
-        controlPnl.add(spaceBtn2);
-
-
-
+        quitBtn.addActionListener((ActionEvent ae) -> System.exit(0));
     }
 
-    private void rock()
-    {
-        int computerChoice = rnd.nextInt(3);
-        if(computerChoice == 0)
-        {
+
+    private void StatsPnl() {
+        // create the stats panel
+        statsPnl = new JPanel();
+
+        playerWinsL = new JLabel("Players Wins: 0");
+        computerWinsL = new JLabel("Computers Wins: 0");
+        tiesLabel = new JLabel("Ties: 0");
+
+        statsPnl.add(playerWinsL);
+        statsPnl.add(computerWinsL);
+        statsPnl.add(tiesLabel);
+
+        statsTF = new JTextField(15);
+    }
+
+
+
+
+    private void WinnerPnl() {
+        // create the winner panel
+        winnerPnl = new JPanel();
+        displayTA = new JTextArea(10, 35);
+        displayTA.setEditable(false);
+        scroller = new JScrollPane(displayTA);
+        winnerPnl.add(scroller);
+    }
+
+
+    private void play(int playerMove) {
+        // computer move
+        int computerMove = rnd.nextInt(3);
+
+        // 0 = rock, 1 = paper, 2 = scissors
+        if (playerMove == computerMove) {
+            if (playerMove == 0) {
+                displayTA.append("Computer plays: Rock\n It's a tie!\n");
+            }
+            else if (playerMove ==1) {
+                displayTA.append("Computer plays: Paper\n It's a tie!\n");
+            }
+            else {
+                displayTA.append("Computer plays: Scissors\n It's a tie!\n");
+            }
             ties++;
-            tiesString = String.valueOf(ties);
-            JOptionPane.showMessageDialog(null, "Computer chose Rock. It's a tie!");
-
+            tiesLabel.setText("Ties: " + ties);
         }
-        else if(computerChoice == 1)
-        {
-            computerWins++;
-            computerWinsString = String.valueOf(computerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Paper. You lose!");
-        }
-        else
-        {
+        else if (playerMove == 1 && computerMove == 0) {
+            displayTA.append("Computer plays: Rock\n Paper covers Rock (Player Wins)\n");
             playerWins++;
-            playerWinsString = String.valueOf(playerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Scissors. You win!");
         }
-        updateDisplay();
-    }
-
-    private void paper()
-    {
-        int computerChoice = rnd.nextInt(3);
-        if(computerChoice == 0)
-        {
-            playerWins++;
-            playerWinsString = String.valueOf(playerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Rock. You win!");
-        }
-        else if(computerChoice == 1)
-        {
-            ties++;
-            tiesString = String.valueOf(ties);
-            JOptionPane.showMessageDialog(null, "Computer chose Paper. It's a tie!");
-
-        }
-        else
-        {
+        else if (playerMove == 0 && computerMove == 1) {
+            displayTA.append("Computer plays: Paper\n Paper covers Rocker (Computer Wins)\n");
             computerWins++;
-            computerWinsString = String.valueOf(computerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Scissors. You lose!");
-
         }
-
-        updateDisplay();
-    }
-
-    private void scissors()
-    {
-        int computerChoice = rnd.nextInt(3);
-        if(computerChoice == 0)
-        {
+        else if (playerMove == 2 && computerMove == 0) {
+            displayTA.append("Computer plays: Rock\n Rock breaks Scissors (Computer Wins)\n");
             computerWins++;
-            computerWinsString = String.valueOf(computerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Rock. You lose!");
         }
-        else if(computerChoice == 1)
-        {
+        else if (playerMove == 0 && computerMove == 2) {
+            displayTA.append("Computer plays: Scissors\n Rock breaks Scissors (Player Wins)\n");
             playerWins++;
-            playerWinsString = String.valueOf(playerWins);
-            JOptionPane.showMessageDialog(null, "Computer chose Paper. You win!");
-
         }
-        else
-        {
-            ties++;
-            tiesString = String.valueOf(ties);
-            JOptionPane.showMessageDialog(null, "Computer chose Scissors. It's a tie!");
+        else if (playerMove == 2 & computerMove == 1) {
+            displayTA.append("Computer plays: Paper\n Scissors cuts Paper (Player Wins)\n");
+            playerWins++;
         }
-
-        updateDisplay();
-    }
-
-    private void updateDisplay()
-    {
-        DisplayPnl.removeAll();
-        JLabel playerWinsLbl = new JLabel("Player Wins: " + playerWinsString);
-        playerWinsLbl.setFont(new Font("Dialog", Font.BOLD, 14));
-        JLabel computerWinsLbl = new JLabel("Computer Wins: " + computerWinsString);
-        computerWinsLbl.setFont(new Font("Dialog", Font.BOLD, 14));
-        JLabel tiesLbl = new JLabel("Ties: " + tiesString);
-        tiesLbl.setFont(new Font("Dialog", Font.BOLD, 14));
-
-        DisplayPnl.add(playerWinsLbl);
-        DisplayPnl.add(computerWinsLbl);
-        DisplayPnl.add(tiesLbl);
-        DisplayPnl.revalidate();
-        DisplayPnl.repaint();
-    }
-
-
-    private void quit()
-    {
-        System.exit(0);
+        else if (playerMove == 1 && computerMove == 2) {
+            displayTA.append("Computer plays: Scissors\n Scissors cuts Paper (Computer Wins)\n");
+            computerWins++;
+        }
+        // update the stats
+        playerWinsL.setText("Player Wins: " + playerWins);
+        computerWinsL.setText("Computer Wins: " + computerWins);
     }
 }
+
+
 
 
